@@ -162,7 +162,7 @@
 </footer>
 
 <!-- Chat Bot -->
-<script type='text/javascript'>
+<!--script type='text/javascript'>
 	function initEmbeddedMessaging() {
 		try {
 			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
@@ -179,7 +179,27 @@
 			console.error('Error loading Embedded Messaging: ', err);
 		}
 	};
+</script-->
+<script type='text/javascript'>
+	function initEmbeddedMessaging() {
+		try {
+			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
+
+			embeddedservice_bootstrap.init(
+				'00DS900000EHpz6',
+				'Agent_Web_Channel',
+				'https://capitamod--qa.sandbox.my.site.com/ESWAgentWebChannel1766492015167',
+				{
+					scrt2URL: 'https://capitamod--qa.sandbox.my.salesforce-scrt.com'
+				}
+			);
+		} catch (err) {
+			console.error('Error loading Embedded Messaging: ', err);
+		}
+	};
 </script>
+<script type='text/javascript' src='https://capitamod--qa.sandbox.my.site.com/ESWAgentWebChannel1766492015167/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
 <script type='text/javascript' src='https://capitamod.my.site.com/ESWAgentTommy1766506685589/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
 </body>
 </html>
