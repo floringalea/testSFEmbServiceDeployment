@@ -177,18 +177,21 @@
 				}
 			);
 
-			window.addEventListener("onEmbeddedMessagingConversationStarted", (event) => {
-			  console.log("Received the onEmbeddedMessagingConversationStarted event…");
-			  console.log("Event detail: ", event.detail);
-
-			  // Do something...
-			});
+			
 		} catch (err) {
 			console.error('Error loading Embedded Messaging: ', err);
 		}
 	};
 </script>
 <script type='text/javascript' src='https://capitamod.my.site.com/ESWAgentTommy1766506685589/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+<script type='text/javascript'>
+	window.addEventListener("onEmbeddedMessagingConversationStarted", (event) => {
+	  console.log("Received the onEmbeddedMessagingConversationStarted event…");
+	  console.log("Event detail: ", event.detail);
+
+	  // Do something...
+	});
+</script>
 	
 <!-- Sandbox Agent -->
 <!--script type='text/javascript'>
