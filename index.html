@@ -176,6 +176,13 @@
 					scrt2URL: 'https://capitamod.my.salesforce-scrt.com'
 				}
 			);
+
+			window.addEventListener("onEmbeddedMessagingConversationStarted", (event) => {
+			  console.log("Received the onEmbeddedMessagingConversationStarted event…");
+			  console.log("Event detail: ", event.detail);
+
+			  // Do something...
+			});
 		} catch (err) {
 			console.error('Error loading Embedded Messaging: ', err);
 		}
