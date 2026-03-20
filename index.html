@@ -119,6 +119,24 @@
       font-size: 1.5em;
       cursor: pointer;
     }
+
+	  .rich-link-container[data-size='small'][lwc-2guddbr87kc] .image-placeholder[lwc-2guddbr87kc] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('https://www.army.mod.uk/media/cqyhndlm/231013a-003jpgicepycfemwataah5_mxku31g.png?width=768&height=576&format=webp&quality=70&v=1db13f8ed90d270');
+    background-repeat: no-repeat;
+    /* background-attachment: fixed; */
+    background-size: cover;
+    /* z-index: 0; */
+    margin: 0 auto;
+}
+.rich-link-container[data-size='small'][lwc-2guddbr87kc] .image-placeholder[lwc-2guddbr87kc] > lightning-icon {
+	display: none;
+}
+.rich-link-container p.rich-link-url {
+    display: none;
+}
   </style>
 </head>
 <body>
@@ -163,14 +181,6 @@
 
 <!-- Chat Bot -->
 <!-- Live Agent -->
-<script>
-	window.addEventListener('load', function () {
-	  const link = document.createElement('link');
-	  link.rel = 'stylesheet';
-	  link.href = 'https://capitamod.my.site.com/feedback/resource/Agent_Cara_CSS';
-	  document.head.appendChild(link);
-	});
-</script>
 <script type='text/javascript'>
 	function initEmbeddedMessaging() {
 		try {
