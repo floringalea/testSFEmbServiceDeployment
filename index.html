@@ -188,14 +188,22 @@
 			embeddedservice_bootstrap.externalStyles = ["Agent_Cara_CSS"];
 			const agentSessionId = crypto.randomUUID();
 
-			  /*embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-				agentSessionId: agentSessionId
-			  });*/
-			embeddedservice_bootstrap.prechatAPI.setVisiblePrechatFields({
-  agentSessionId: "VISIBLE_TEST"
-});
+			  window.addEventListener("onEmbeddedMessagingReady", () => {
+			  const waitForAPI = setInterval(() => {
+			    if (embeddedservice_bootstrap?.prechatAPI?.setHiddenPrechatFields) {
+			      clearInterval(waitForAPI);
 			
-			  window.myAgentSessionId = agentSessionId;
+			      const agentSessionId = crypto.randomUUID();
+			      console.log("SETTING HIDDEN FIELD:", agentSessionId);
+			
+			      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+			        agentSessionId: agentSessionId
+			      });
+			    }
+			  }, 100);
+			});
+			
+			window.myAgentSessionId = agentSessionId;
 			console.log("Prechat field set:", agentSessionId);
 			
 			embeddedservice_bootstrap.init(
