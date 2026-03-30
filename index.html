@@ -186,6 +186,13 @@
 		try {
 			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
 			embeddedservice_bootstrap.externalStyles = ["Agent_Cara_CSS"];
+			const agentSessionId = crypto.randomUUID();
+
+			  embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+				agentSessionId: agentSessionId
+			  });
+			
+			  window.myAgentSessionId = agentSessionId;
 			embeddedservice_bootstrap.init(
 				'00Dd30000059tP0',
 				'Agent_Tommy',
