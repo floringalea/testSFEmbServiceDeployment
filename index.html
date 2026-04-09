@@ -182,46 +182,66 @@
 <!-- Chat Bot -->
 <!-- Idle Message -->
 <script type="text/javascript">
-	(function() {
-	
-	  console.log('Agentforce Initialization Timer loaded');
-	
-	  var WEB_STORAGE_SUFFIX = '_WEB_STORAGE';
-	
-	  /**
-	   * Scans localStorage for a key ending in _WEB_STORAGE and returns the JWT value.
-	   * Runs outside LWS/Locker Service so it has direct localStorage access.
-	   */
-	  function getJwtFromStorage() {
-	    for (var i = 0; i < localStorage.length; i++) {
-	      var key = localStorage.key(i);
-	      if (key && key.endsWith(WEB_STORAGE_SUFFIX)) {
-	        try {
-	          var data = JSON.parse(localStorage.getItem(key));
-	          if (data && data.JWT) {
-	            console.log('[AgentforceHeader] Found JWT at localStorage key:', key);
-	            return data.JWT;
-	          }
-	        } catch (e) {
-	          console.warn('[AgentforceHeader] Failed to parse localStorage key:', key, e);
-	        }
-	      }
-	    }
-	    console.warn('[AgentforceHeader] No JWT found in localStorage');
-	    return null;
-	  }
-	
-	  // Listen for requests from the LWC (which cannot access localStorage directly due to LWS).
-	  // Respond with agentforceJwtReady containing the JWT.
-	  window.addEventListener('agentforceRequestJwt', function() {
-	    console.log('[AgentforceHeader] Received agentforceRequestJwt');
-	    var jwt = getJwtFromStorage();
-	    window.dispatchEvent(new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } }));
-	  });
-	
-	  console.log('[AgentforceHeader] JWT bridge ready - listening for agentforceRequestJwt');
-	
-	})();
+	<script type="text/javascript">
+(function() {
+
+  console.log('Agentforce Initialization Timer loaded');
+
+  var WEB_STORAGE_SUFFIX = '_WEB_STORAGE';
+
+  /**
+   * Scans localStorage for a key ending in _WEB_STORAGE and returns the JWT value.
+   * Runs outside LWS/Locker Service so it has direct localStorage access.
+   * 
+   * Handles multiple key patterns:
+   * - [OrgId]_WEB_STORAGE (standard)
+   * - [OrgId]_CWC_WEB_STORAGE (Messaging for Web/In-App)
+   * 
+   * Handles multiple JWT property names:
+   * - jwt (lowercase) - Messaging for Web
+   * - JWT (uppercase) - other contexts
+   */
+  function getJwtFromStorage() {
+    console.log('[AgentforceHeader] Scanning localStorage (' + localStorage.length + ' keys)');
+    
+    // Debug: log all keys
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      console.log('[AgentforceHeader] localStorage[' + i + ']: ' + key);
+    }
+    
+    // Search for JWT - try both key patterns and property names
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key && (key.endsWith(WEB_STORAGE_SUFFIX) || key.endsWith('_CWC_WEB_STORAGE'))) {
+        try {
+          var data = JSON.parse(localStorage.getItem(key));
+          // Try both uppercase JWT and lowercase jwt
+          var jwtToken = data.JWT || data.jwt;
+          if (jwtToken) {
+            console.log('[AgentforceHeader] Found JWT at localStorage key:', key);
+            return jwtToken;
+          }
+        } catch (e) {
+          console.warn('[AgentforceHeader] Failed to parse localStorage key:', key, e);
+        }
+      }
+    }
+    console.warn('[AgentforceHeader] No JWT found in localStorage - this may be a guest chat or unauthenticated session');
+    return null;
+  }
+
+  // Listen for requests from the LWC (which cannot access localStorage directly due to LWS).
+  // Respond with agentforceJwtReady containing the JWT.
+  window.addEventListener('agentforceRequestJwt', function() {
+    console.log('[AgentforceHeader] Received agentforceRequestJwt');
+    var jwt = getJwtFromStorage();
+    window.dispatchEvent(new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } }));
+  });
+
+  console.log('[AgentforceHeader] JWT bridge ready - listening for agentforceRequestJwt');
+
+})();
 </script>
 <!-- Live Agent -->
 <script type='text/javascript'>
