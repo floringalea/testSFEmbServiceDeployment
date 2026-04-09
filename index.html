@@ -245,6 +245,235 @@
 	};
 </script>
 <script type='text/javascript' src='https://capitamod.my.site.com/ESWAgentTommy1766506685589/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
+<script type='text/javascript'>
+	/**
+ * Agentforce Idle Timer - Pure JavaScript Implementation
+ * 
+ * This standalone script manages an idle timeout for Enhanced Chat conversations
+ * on external websites. It requires the agentforce-init-timer.js header script to
+ * be loaded first for JWT retrieval.
+ * 
+ * Usage:
+ * 1. Include agentforce-init-timer.js in <head> first
+ * 2. Include this script after the embedded service deployment script
+ * 
+ * Configuration:
+ * - Modify TIMER_MINUTES to change the idle timeout
+ * - Modify SCRT_BASE_URL to match your Salesforce org's My Domain
+ */
+
+(function() {
+  'use strict';
+
+  // ============================================================================
+  // CONFIGURATION
+  // ============================================================================
+  
+  const TIMER_MINUTES = 1;  // Change this to your desired timeout (e.g., 20 for 20 minutes)
+  const SCRT_BASE_URL = 'https://capitamod.my.salesforce-scrt.com';  // Update to YOUR org's My Domain
+  const SESSION_API_BASE_URL = SCRT_BASE_URL + '/iamessage/v1/conversation';
+
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+
+  var state = {
+    intervalId: null,
+    timeoutId: null,
+    conversationId: null,
+    timerExpired: false
+  };
+
+  // ============================================================================
+  // LOGGING HELPER
+  // ============================================================================
+
+  function log(message) {
+    console.log('[AgentforceTimer] ' + message);
+  }
+
+  function logError(message) {
+    console.error('[AgentforceTimer] ' + message);
+  }
+
+  // ============================================================================
+  // TIMER MANAGEMENT
+  // ============================================================================
+
+  function clearTimers() {
+    if (state.intervalId) {
+      clearInterval(state.intervalId);
+      state.intervalId = null;
+    }
+    if (state.timeoutId) {
+      clearTimeout(state.timeoutId);
+      state.timeoutId = null;
+    }
+  }
+
+  function startTimer() {
+    if (state.timerExpired) {
+      log('Timer already expired - not restarting');
+      return;
+    }
+
+    clearTimers();
+    
+    var timerMs = TIMER_MINUTES * 60 * 1000;
+    log('Starting ' + TIMER_MINUTES + ' minute timer');
+    
+    var elapsedSeconds = 0;
+    state.intervalId = setInterval(function() {
+      elapsedSeconds += 10;
+      log('Timer running for ' + elapsedSeconds + ' seconds');
+    }, 10000);
+
+    state.timeoutId = setTimeout(function() {
+      clearTimers();
+      state.timerExpired = true;
+      sendIdleRequest();
+    }, timerMs);
+  }
+
+  function resetTimer() {
+    log('Resetting timer (activity detected)');
+    state.timerExpired = false;
+    startTimer();
+  }
+
+  // ============================================================================
+  // JWT RETRIEVAL
+  // ============================================================================
+
+  function requestJwtFromBridge() {
+    log('Requesting JWT from header bridge');
+    window.dispatchEvent(new Event('agentforceRequestJwt'));
+  }
+
+  function onJwtReady(event) {
+    var accessToken = event.detail?.jwt;
+    if (!accessToken) {
+      logError('JWT bridge returned no JWT - check header script is deployed');
+      state.timerExpired = false;
+      startTimer();
+      return;
+    }
+
+    callSessionApi(accessToken);
+  }
+
+  // ============================================================================
+  // MESSAGING API CALL
+  // ============================================================================
+
+  function sendIdleRequest() {
+    var conversationId = state.conversationId;
+    if (!conversationId) {
+      logError('No conversationId - cannot call session API');
+      state.timerExpired = false;
+      startTimer();
+      return;
+    }
+
+    log('Timer expired - conversationId: ' + conversationId + ' | Requesting JWT from header bridge');
+    
+    // Set up listener for JWT response
+    var jwtHandler = function(event) {
+      window.removeEventListener('agentforceJwtReady', jwtHandler);
+      onJwtReady(event);
+    };
+    
+    window.addEventListener('agentforceJwtReady', jwtHandler);
+    requestJwtFromBridge();
+  }
+
+  function callSessionApi(accessToken) {
+    var conversationId = state.conversationId;
+    var url = SESSION_API_BASE_URL + '/' + conversationId;
+    
+    log('JWT received, length: ' + accessToken.length + ' | Calling DELETE ' + url);
+
+    fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+    .then(function(response) {
+      log('Session API response status: ' + response.status);
+      
+      if (!response.ok) {
+        return response.text().then(function(body) {
+          throw new Error('Session API returned ' + response.status + ': ' + body);
+        });
+      }
+
+      log('Conversation ended successfully via Messaging API');
+      // Timer stays expired; conversation is now closed
+    })
+    .catch(function(error) {
+      logError('Session API call failed: ' + error.message);
+      // Allow retry on next activity
+      state.timerExpired = false;
+      startTimer();
+    });
+  }
+
+  // ============================================================================
+  // ENHANCED CHAT EVENT LISTENERS
+  // ============================================================================
+
+  function onEmbeddedMessagingReady() {
+    log('onEmbeddedMessagingReady event received - chat is ready');
+    // Chat is loaded, but don't start timer until conversation starts
+  }
+
+  function onEmbeddedMessagingConversationStarted(event) {
+    state.conversationId = event.detail?.conversationId;
+    log('onEmbeddedMessagingConversationStarted - conversationId: ' + state.conversationId);
+    startTimer();
+  }
+
+  function onEmbeddedMessageSent(event) {
+    log('onEmbeddedMessageSent - resetting timer');
+    resetTimer();
+  }
+
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+
+  function init() {
+    log('Pure JavaScript Timer initialized');
+    
+    // Listen for chat events
+    window.addEventListener('onEmbeddedMessagingReady', onEmbeddedMessagingReady);
+    window.addEventListener('onEmbeddedMessagingConversationStarted', onEmbeddedMessagingConversationStarted);
+    window.addEventListener('onEmbeddedMessageSent', onEmbeddedMessageSent);
+
+    log('Event listeners registered - monitoring for Enhanced Chat events');
+  }
+
+  // ============================================================================
+  // CLEANUP
+  // ============================================================================
+
+  window.addEventListener('beforeunload', function() {
+    clearTimers();
+    window.removeEventListener('onEmbeddedMessagingReady', onEmbeddedMessagingReady);
+    window.removeEventListener('onEmbeddedMessagingConversationStarted', onEmbeddedMessagingConversationStarted);
+    window.removeEventListener('onEmbeddedMessageSent', onEmbeddedMessageSent);
+  });
+
+  // ============================================================================
+  // START
+  // ============================================================================
+
+  init();
+})();
+</script>
 	
 <!-- Sandbox Agent -->
 <!--script type='text/javascript'>
