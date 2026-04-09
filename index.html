@@ -180,31 +180,54 @@
 </footer>
 
 <!-- Chat Bot -->
+<!-- Idle Message -->
+<script type="text/javascript">
+	(function() {
+	
+	  console.log('Agentforce Initialization Timer loaded');
+	
+	  var WEB_STORAGE_SUFFIX = '_WEB_STORAGE';
+	
+	  /**
+	   * Scans localStorage for a key ending in _WEB_STORAGE and returns the JWT value.
+	   * Runs outside LWS/Locker Service so it has direct localStorage access.
+	   */
+	  function getJwtFromStorage() {
+	    for (var i = 0; i < localStorage.length; i++) {
+	      var key = localStorage.key(i);
+	      if (key && key.endsWith(WEB_STORAGE_SUFFIX)) {
+	        try {
+	          var data = JSON.parse(localStorage.getItem(key));
+	          if (data && data.JWT) {
+	            console.log('[AgentforceHeader] Found JWT at localStorage key:', key);
+	            return data.JWT;
+	          }
+	        } catch (e) {
+	          console.warn('[AgentforceHeader] Failed to parse localStorage key:', key, e);
+	        }
+	      }
+	    }
+	    console.warn('[AgentforceHeader] No JWT found in localStorage');
+	    return null;
+	  }
+	
+	  // Listen for requests from the LWC (which cannot access localStorage directly due to LWS).
+	  // Respond with agentforceJwtReady containing the JWT.
+	  window.addEventListener('agentforceRequestJwt', function() {
+	    console.log('[AgentforceHeader] Received agentforceRequestJwt');
+	    var jwt = getJwtFromStorage();
+	    window.dispatchEvent(new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } }));
+	  });
+	
+	  console.log('[AgentforceHeader] JWT bridge ready - listening for agentforceRequestJwt');
+	
+	})();
+</script>
 <!-- Live Agent -->
 <script type='text/javascript'>
 	function initEmbeddedMessaging() {
 		try {
 			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
-			embeddedservice_bootstrap.externalStyles = ["Agent_Cara_CSS"];
-			const agentSessionId = crypto.randomUUID();
-
-			  window.addEventListener("onEmbeddedMessagingReady", () => {
-			  const waitForAPI = setInterval(() => {
-			    if (embeddedservice_bootstrap?.prechatAPI?.setHiddenPrechatFields) {
-			      clearInterval(waitForAPI);
-			
-			      const agentSessionId = crypto.randomUUID();
-			      console.log("SETTING HIDDEN FIELD:", agentSessionId);
-			
-			      embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-			        agentSessionId: agentSessionId
-			      });
-			    }
-			  }, 100);
-			});
-			
-			window.myAgentSessionId = agentSessionId;
-			console.log("Prechat field set:", agentSessionId);
 			
 			embeddedservice_bootstrap.init(
 				'00Dd30000059tP0',
