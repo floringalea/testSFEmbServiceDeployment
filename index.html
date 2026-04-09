@@ -181,12 +181,24 @@
 
 <!-- Chat Bot -->
 <!-- Idle Message -->
+
 <script type="text/javascript">
 (function() {
 
   console.log('Agentforce Initialization Timer loaded');
-
-  var WEB_STORAGE_SUFFIX = '_WEB_STORAGE';
+  console.log('[AgentforceHeader] window:', typeof window);
+  console.log('[AgentforceHeader] localStorage:', typeof localStorage);
+  console.log('[AgentforceHeader] localStorage.length:', localStorage.length);
+  console.log('[AgentforceHeader] Current URL:', window.location.href);
+  
+  // Log ALL localStorage entries immediately
+  console.log('[AgentforceHeader] ========== FULL LOCALSTORAGE DUMP ==========');
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    var value = localStorage.getItem(key);
+    console.log('[AgentforceHeader] localStorage["' + key + '"] = ' + (value ? value.substring(0, 100) + '...' : 'null'));
+  }
+  console.log('[AgentforceHeader] ========== END DUMP ==========');
 
   /**
    * Scans localStorage for a key ending in _WEB_STORAGE and returns the JWT value.
@@ -234,6 +246,16 @@
   // Respond with agentforceJwtReady containing the JWT.
   window.addEventListener('agentforceRequestJwt', function(event) {
     console.log('[AgentforceHeader] Received agentforceRequestJwt event', event);
+    console.log('[AgentforceHeader] localStorage.length AT REQUEST TIME:', localStorage.length);
+    
+    // Dump localStorage state at request time
+    console.log('[AgentforceHeader] ========== LOCALSTORAGE AT REQUEST TIME ==========');
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      console.log('[AgentforceHeader] localStorage[' + i + ']: ' + key);
+    }
+    console.log('[AgentforceHeader] ========== END DUMP ==========');
+    
     var jwt = getJwtFromStorage();
     console.log('[AgentforceHeader] JWT retrieved, dispatching agentforceJwtReady with jwt length:', jwt ? jwt.length : 'null');
     var responseEvent = new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } });
@@ -490,6 +512,23 @@
 
   function init() {
     log('Pure JavaScript Timer initialized');
+    log('Current URL:', window.location.href);
+    log('localStorage available:', typeof localStorage !== 'undefined');
+    log('localStorage.length from timer script:', localStorage ? localStorage.length : 'N/A');
+    
+    // Log localStorage from timer perspective
+    if (localStorage && localStorage.length > 0) {
+      log('========== LOCALSTORAGE FROM TIMER SCRIPT ==========');
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (key && key.indexOf('WEB_STORAGE') > -1) {
+          log('localStorage["' + key + '"] found in timer script');
+        }
+      }
+      log('========== END ==========');
+    } else {
+      log('localStorage is empty from timer script perspective');
+    }
     
     // Listen for chat events
     window.addEventListener('onEmbeddedMessagingReady', onEmbeddedMessagingReady);
@@ -516,7 +555,6 @@
 
   init();
 })();
-
 </script>
 	
 <!-- Sandbox Agent -->
