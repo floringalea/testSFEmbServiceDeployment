@@ -182,7 +182,6 @@
 <!-- Chat Bot -->
 <!-- Idle Message -->
 <script type="text/javascript">
-	<script type="text/javascript">
 (function() {
 
   console.log('Agentforce Initialization Timer loaded');
@@ -233,13 +232,18 @@
 
   // Listen for requests from the LWC (which cannot access localStorage directly due to LWS).
   // Respond with agentforceJwtReady containing the JWT.
-  window.addEventListener('agentforceRequestJwt', function() {
-    console.log('[AgentforceHeader] Received agentforceRequestJwt');
+  window.addEventListener('agentforceRequestJwt', function(event) {
+    console.log('[AgentforceHeader] Received agentforceRequestJwt event', event);
     var jwt = getJwtFromStorage();
-    window.dispatchEvent(new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } }));
+    console.log('[AgentforceHeader] JWT retrieved, dispatching agentforceJwtReady with jwt length:', jwt ? jwt.length : 'null');
+    var responseEvent = new CustomEvent('agentforceJwtReady', { detail: { jwt: jwt } });
+    console.log('[AgentforceHeader] Dispatching event:', responseEvent);
+    window.dispatchEvent(responseEvent);
+    console.log('[AgentforceHeader] Event dispatched');
   });
 
   console.log('[AgentforceHeader] JWT bridge ready - listening for agentforceRequestJwt');
+  console.log('[AgentforceHeader] window.addEventListener available:', typeof window.addEventListener);
 
 })();
 </script>
@@ -368,11 +372,17 @@
 
   function requestJwtFromBridge() {
     log('Requesting JWT from header bridge');
-    window.dispatchEvent(new Event('agentforceRequestJwt'));
+    log('Dispatching agentforceRequestJwt event...');
+    var event = new Event('agentforceRequestJwt');
+    log('Event created:', event);
+    window.dispatchEvent(event);
+    log('Event dispatched');
   }
 
   function onJwtReady(event) {
+    log('onJwtReady event received:', event);
     var accessToken = event.detail?.jwt;
+    log('JWT from event.detail:', accessToken ? 'present (length: ' + accessToken.length + ')' : 'null');
     if (!accessToken) {
       logError('JWT bridge returned no JWT - check header script is deployed');
       state.timerExpired = false;
@@ -400,11 +410,24 @@
     
     // Set up listener for JWT response
     var jwtHandler = function(event) {
+      log('jwtHandler triggered - removing listener and calling onJwtReady');
       window.removeEventListener('agentforceJwtReady', jwtHandler);
+      clearTimeout(jwtTimeoutId);
       onJwtReady(event);
     };
     
+    // Timeout if JWT doesn't arrive within 5 seconds
+    var jwtTimeoutId = setTimeout(function() {
+      log('JWT timeout - no response from header bridge after 5 seconds');
+      window.removeEventListener('agentforceJwtReady', jwtHandler);
+      logError('JWT bridge did not respond in time');
+      state.timerExpired = false;
+      startTimer();
+    }, 5000);
+    
+    log('Adding listener for agentforceJwtReady event');
     window.addEventListener('agentforceJwtReady', jwtHandler);
+    log('Listener added, now dispatching agentforceRequestJwt');
     requestJwtFromBridge();
   }
 
@@ -493,6 +516,7 @@
 
   init();
 })();
+
 </script>
 	
 <!-- Sandbox Agent -->
