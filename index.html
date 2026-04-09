@@ -293,7 +293,7 @@
 <script type='text/javascript' src='https://capitamod.my.site.com/ESWAgentTommy1766506685589/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
 
 <script type='text/javascript'>
-	/**
+/**
  * Agentforce Idle Timer - Pure JavaScript Implementation
  * 
  * This standalone script manages an idle timeout for Enhanced Chat conversations
@@ -389,69 +389,120 @@
   }
 
   // ============================================================================
-  // JWT RETRIEVAL
+  // JWT RETRIEVAL VIA SALESFORCE APEX
   // ============================================================================
 
-  function requestJwtFromBridge() {
-    log('Requesting JWT from header bridge');
-    log('Dispatching agentforceRequestJwt event...');
-    var event = new Event('agentforceRequestJwt');
-    log('Event created:', event);
-    window.dispatchEvent(event);
-    log('Event dispatched');
-  }
-
-  function onJwtReady(event) {
-    log('onJwtReady event received:', event);
-    var accessToken = event.detail?.jwt;
-    log('JWT from event.detail:', accessToken ? 'present (length: ' + accessToken.length + ')' : 'null');
-    if (!accessToken) {
-      logError('JWT bridge returned no JWT - check header script is deployed');
-      state.timerExpired = false;
-      startTimer();
-      return;
+  function requestJwtFromApex() {
+    log('Requesting JWT via Apex endpoint: AgentforceTimerController.getMessagingJwt');
+    
+    var conversationId = state.conversationId;
+    if (!conversationId) {
+      logError('No conversationId available for JWT request');
+      return false;
     }
 
-    callSessionApi(accessToken);
+    // Call Salesforce Apex method via fetch
+    var apexCallData = {
+      action: 'AgentforceTimerController.getMessagingJwt',
+      params: {
+        conversationId: conversationId
+      }
+    };
+
+    fetch('/services/apexrest/messaging/jwt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getSessionToken()
+      },
+      body: JSON.stringify(apexCallData)
+    })
+    .then(function(response) {
+      log('Apex response status: ' + response.status);
+      
+      if (!response.ok) {
+        return response.text().then(function(body) {
+          throw new Error('Apex call failed: ' + response.status + ' - ' + body);
+        });
+      }
+
+      return response.json();
+    })
+    .then(function(data) {
+      log('JWT received from Apex, length: ' + (data.jwt ? data.jwt.length : '0'));
+      if (data.jwt) {
+        callSessionApi(data.jwt);
+      } else {
+        logError('Apex did not return a JWT');
+        state.timerExpired = false;
+        startTimer();
+      }
+    })
+    .catch(function(error) {
+      logError('Failed to get JWT from Apex: ' + error.message);
+      state.timerExpired = false;
+      startTimer();
+    });
+  }
+
+  /**
+   * Get the Salesforce session token from window context
+   * This is available when running on Salesforce pages or sites
+   */
+  function getSessionToken() {
+    // Try multiple ways to get the session token
+    if (window.__SESSION_ID__) {
+      return window.__SESSION_ID__;
+    }
+    if (window.sforce && window.sforce.connection && window.sforce.connection.sessionId) {
+      return window.sforce.connection.sessionId;
+    }
+    // For embedded service on external sites, use a different approach
+    // See alternative method below
+    return '';
   }
 
   // ============================================================================
   // MESSAGING API CALL
   // ============================================================================
 
-  function sendIdleRequest() {
-    var conversationId = state.conversationId;
-    if (!conversationId) {
-      logError('No conversationId - cannot call session API');
-      state.timerExpired = false;
-      startTimer();
-      return;
-    }
-
-    log('Timer expired - conversationId: ' + conversationId + ' | Requesting JWT from header bridge');
-    
-    // Set up listener for JWT response
-    var jwtHandler = function(event) {
-      log('jwtHandler triggered - removing listener and calling onJwtReady');
-      window.removeEventListener('agentforceJwtReady', jwtHandler);
-      clearTimeout(jwtTimeoutId);
-      onJwtReady(event);
-    };
-    
-    // Timeout if JWT doesn't arrive within 5 seconds
-    var jwtTimeoutId = setTimeout(function() {
-      log('JWT timeout - no response from header bridge after 5 seconds');
-      window.removeEventListener('agentforceJwtReady', jwtHandler);
-      logError('JWT bridge did not respond in time');
-      state.timerExpired = false;
-      startTimer();
-    }, 5000);
-    
-    log('Adding listener for agentforceJwtReady event');
-    window.addEventListener('agentforceJwtReady', jwtHandler);
-    log('Listener added, now dispatching agentforceRequestJwt');
-    requestJwtFromBridge();
+ function sendIdleRequest() {
+  var conversationId = state.conversationId;
+  if (!conversationId) {
+    logError('No conversationId - cannot end session');
+    state.timerExpired = false;
+    startTimer();
+    return;
   }
+
+  log('Timer expired - ending conversation via embedded service API');
+
+  try {
+    // Use the Salesforce-provided API to end the conversation
+    // This runs within the same context as the embedded service
+    // and doesn't require direct JWT access
+    if (typeof embeddedservice_bootstrap !== 'undefined') {
+      // Try the available API methods (varies by version)
+      if (embeddedservice_bootstrap.utilAPI && 
+          typeof embeddedservice_bootstrap.utilAPI.endChat === 'function') {
+        embeddedservice_bootstrap.utilAPI.endChat();
+        log('Conversation ended via utilAPI.endChat()');
+      } else if (embeddedservice_bootstrap.prechatAPI && 
+                 typeof embeddedservice_bootstrap.prechatAPI.closeChat === 'function') {
+        embeddedservice_bootstrap.prechatAPI.closeChat();
+        log('Conversation ended via prechatAPI.closeChat()');
+      } else {
+        logError('No supported API method found to end chat');
+        // Fallback: try dispatching the minimize/close event
+        window.dispatchEvent(new CustomEvent('onEmbeddedMessagingCloseChat'));
+      }
+    }
+  } catch (error) {
+    logError('Failed to end conversation: ' + error.message);
+    state.timerExpired = false;
+    startTimer();
+  }
+}
 
   function callSessionApi(accessToken) {
     var conversationId = state.conversationId;
@@ -555,6 +606,7 @@
 
   init();
 })();
+
 </script>
 	
 <!-- Sandbox Agent -->
