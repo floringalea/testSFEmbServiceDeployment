@@ -2,183 +2,869 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
-  <title>FutureTech University</title>
+  <meta name="viewport" content="width=1440, initial-scale=1.0" />
+  <title>Army Recruitment Demo</title>
+
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      background-color: #F4F7E9;
+    :root {
+      --black: #101010;
+      --charcoal: #1c1c1c;
+      --yellow: #ffcc00;
+      --khaki: #77724f;
+      --stone: #f3f0e7;
+      --white: #ffffff;
+      --muted: #c9c9c9;
     }
 
-    header {
-      background-color: #003366;
-      color: white;
-      padding: 20px 50px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--stone);
+      color: var(--black);
+      min-width: 1180px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .top-bar {
+      height: 38px;
+      background: #000;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 28px;
+      padding: 0 70px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .main-nav {
+      height: 92px;
+      background: var(--black);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      padding: 0 70px;
+      gap: 44px;
+      border-bottom: 4px solid var(--yellow);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .logo {
+      width: 132px;
+      height: 62px;
+      border: 2px solid var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      line-height: 1;
+    }
+
+    .logo span:first-child {
+      font-size: 30px;
+    }
+
+    .logo span:last-child {
+      font-size: 10px;
+      margin-top: 5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex: 1;
+    }
+
+    .nav-links a {
+      opacity: 0.92;
+    }
+
+    .nav-links a:hover {
+      color: var(--yellow);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border: 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-yellow {
+      background: var(--yellow);
+      color: #000;
+    }
+
+    .btn-dark {
+      background: #000;
+      color: var(--white);
+      border: 2px solid var(--yellow);
+    }
+
+    .btn-light {
+      background: var(--white);
+      color: #000;
+    }
+
+    .hero {
+      min-height: 620px;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.78) 42%, rgba(0,0,0,0.25) 100%),
+        url("https://images.unsplash.com/photo-1521727857535-28d2047619b7?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+      color: var(--white);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      padding: 84px 70px;
+      gap: 60px;
+    }
+
+    .hero-kicker {
+      display: inline-block;
+      background: var(--yellow);
+      color: #000;
+      padding: 8px 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: 82px;
+      line-height: 0.92;
+      text-transform: uppercase;
+      max-width: 670px;
+      letter-spacing: -0.04em;
+      margin-bottom: 28px;
+    }
+
+    .hero p {
+      font-size: 22px;
+      line-height: 1.45;
+      max-width: 620px;
+      color: #eeeeee;
+      margin-bottom: 34px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .hero-panel {
+      align-self: end;
+      background: rgba(16,16,16,0.92);
+      border-left: 8px solid var(--yellow);
+      padding: 34px;
+      max-width: 520px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    }
+
+    .hero-panel h2 {
+      font-size: 30px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .search-row {
+      display: flex;
+      margin-top: 20px;
+      height: 54px;
+    }
+
+    .search-row input {
+      flex: 1;
+      border: 0;
+      padding: 0 18px;
+      font-size: 16px;
+    }
+
+    .search-row button {
+      width: 140px;
+      background: var(--yellow);
+      border: 0;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .suggestions {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .suggestions span {
+      border: 1px solid #555;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: #f0f0f0;
+      cursor: pointer;
+    }
+
+    .section {
+      padding: 76px 70px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 36px;
+    }
+
+    .section-title h2 {
+      font-size: 48px;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+    }
+
+    .section-title p {
+      max-width: 520px;
+      color: #555;
+      line-height: 1.5;
+      font-size: 17px;
+    }
+
+    .pathways {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .pathway-card {
+      background: var(--white);
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 340px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.09);
+    }
+
+    .pathway-image {
+      background-size: cover;
+      background-position: center;
+    }
+
+    .regular-img {
+      background-image: url("https://images.unsplash.com/photo-1519074002996-a69e7ac46a42?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .reserve-img {
+      background-image: url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80");
+    }
+
+    .pathway-content {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pathway-content h3 {
+      font-size: 34px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .pathway-content p {
+      color: #4a4a4a;
+      line-height: 1.55;
+      font-size: 16px;
+      margin-bottom: 22px;
+    }
+
+    .benefits {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .benefit {
+      background: #f1f1f1;
+      padding: 15px;
+      border-top: 4px solid var(--yellow);
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .roles-section {
+      background: var(--charcoal);
+      color: var(--white);
+    }
+
+    .roles-section .section-title p {
+      color: var(--muted);
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .role-card {
+      background: #2a2a2a;
+      min-height: 240px;
+      padding: 26px;
+      border-bottom: 6px solid var(--yellow);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .role-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .role-number {
+      font-size: 54px;
+      font-weight: 900;
+      color: rgba(255,204,0,0.35);
+      position: absolute;
+      top: 16px;
+      right: 22px;
+    }
+
+    .role-card h3 {
+      font-size: 24px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      max-width: 190px;
+    }
+
+    .role-card p {
+      color: #d7d7d7;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    .join-wrapper {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 46px;
+      align-items: start;
+    }
+
+    .join-callout {
+      background: var(--yellow);
+      padding: 40px;
+    }
+
+    .join-callout h2 {
+      font-size: 46px;
+      line-height: 1;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .join-callout p {
+      font-size: 18px;
+      line-height: 1.5;
+      margin-bottom: 26px;
+    }
+
+    .steps {
+      display: grid;
+      gap: 16px;
+    }
+
+    .step {
+      background: var(--white);
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 22px;
+      align-items: start;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    }
+
+    .step strong {
+      background: var(--black);
+      color: var(--yellow);
+      height: 54px;
+      width: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .step h3 {
+      text-transform: uppercase;
+      margin-bottom: 7px;
+      font-size: 21px;
+    }
+
+    .step p {
+      color: #555;
+      line-height: 1.45;
+    }
+
+    .feature-band {
+      background:
+        linear-gradient(rgba(0,0,0,0.76), rgba(0,0,0,0.76)),
+        url("https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+      color: var(--white);
+      padding: 80px 70px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 28px;
+    }
+
+    .feature {
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 30px;
+      background: rgba(0,0,0,0.35);
+    }
+
+    .feature h3 {
+      font-size: 28px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .feature p {
+      color: #dddddd;
+      line-height: 1.5;
+    }
+
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .event-card {
+      background: var(--white);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    }
+
+    .event-date {
+      background: var(--black);
+      color: var(--white);
+      padding: 18px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    header nav a {
-      color: white;
-      margin: 0 15px;
-      text-decoration: none;
-      font-weight: bold;
+    .event-date strong {
+      color: var(--yellow);
+      font-size: 28px;
     }
 
-    .hero {
-      background: url('https://assets.weforum.org/article/image/responsive_big_webp_pvHwd-UDSSKJlYUP8ic24kGrlqfMaCSlTFQljAb4zjY.webp') no-repeat center center/cover;
-      color: white;
-      padding: 100px 50px;
-      text-align: center;
+    .event-body {
+      padding: 26px;
     }
 
-    .hero h1 {
-      font-size: 3em;
+    .event-body h3 {
+      font-size: 22px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .event-body p {
+      color: #555;
+      line-height: 1.5;
       margin-bottom: 20px;
     }
 
-    .section {
-      padding: 50px;
-      text-align: center;
+    .final-cta {
+      background: var(--yellow);
+      padding: 66px 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
     }
 
-    .section img {
-      width: 80%;
-      max-width: 600px;
-      border-radius: 10px;
-      margin-top: 20px;
+    .final-cta h2 {
+      font-size: 54px;
+      line-height: 1;
+      text-transform: uppercase;
+      max-width: 720px;
+    }
+
+    .final-cta p {
+      font-size: 18px;
+      line-height: 1.45;
+      max-width: 460px;
+      margin-top: 14px;
     }
 
     footer {
-      background-color: #002244;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    /* Chat Bot Widget */
-    #chatbot-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      border-radius: 10px;
-      overflow: hidden;
-      display: none;
-      flex-direction: column;
-    }
-
-    #chat-header {
-      background-color: #004488;
-      color: white;
-      padding: 10px;
-      font-weight: bold;
-    }
-
-    #chat-body {
-      height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-      font-size: 0.9em;
-    }
-
-    #chat-input {
-      border-top: 1px solid #ccc;
+      background: #050505;
+      color: var(--white);
+      padding: 42px 70px;
       display: flex;
+      justify-content: space-between;
+      align-items: start;
+      font-size: 14px;
     }
 
-    #chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: none;
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      text-transform: uppercase;
+      font-weight: 700;
     }
 
-    #chat-input button {
-      background-color: #004488;
-      color: white;
-      border: none;
-      padding: 0 15px;
-      cursor: pointer;
+    .demo-note {
+      margin-top: 18px;
+      color: #999;
+      max-width: 520px;
+      line-height: 1.5;
     }
-
-    #chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background-color: #004488;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.5em;
-      cursor: pointer;
-    }
-
-	  .rich-link-container[data-size='small'][lwc-2guddbr87kc] .image-placeholder[lwc-2guddbr87kc] {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: url('https://www.army.mod.uk/media/cqyhndlm/231013a-003jpgicepycfemwataah5_mxku31g.png?width=768&height=576&format=webp&quality=70&v=1db13f8ed90d270');
-    background-repeat: no-repeat;
-    /* background-attachment: fixed; */
-    background-size: cover;
-    /* z-index: 0; */
-    margin: 0 auto;
-}
-.rich-link-container[data-size='small'][lwc-2guddbr87kc] .image-placeholder[lwc-2guddbr87kc] > lightning-icon {
-	display: none;
-}
-.rich-link-container p.rich-link-url {
-    display: none;
-}
   </style>
 </head>
+
 <body>
+  <div class="top-bar">
+    <a href="#">My Account</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Ask a Soldier</a>
+  </div>
 
-<header>
-  <div><strong>Bluewave University</strong></div>
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">Admissions</a>
-    <a href="#">Academics</a>
-    <a href="#">Campus Life</a>
-    <a href="#">Contact</a>
+  <nav class="main-nav">
+    <a class="logo" href="#">
+      <span>ARMY</span>
+      <span>BE THE BEST</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#regular">Regular Army</a>
+      <a href="#reserve">Army Reserve</a>
+      <a href="#roles">Find a Role</a>
+      <a href="#join">How to Join</a>
+      <a href="#events">Events</a>
+    </div>
+
+    <div class="nav-actions">
+      <a class="btn btn-dark" href="#">Explore Roles</a>
+      <a class="btn btn-yellow" href="#">Apply Now</a>
+    </div>
   </nav>
-</header>
 
-<div class="hero">
-  <h1>Welcome to Bluewave University</h1>
-  <p>Innovating minds for a brighter tomorrow.</p>
-</div>
+  <header class="hero">
+    <div>
+      <span class="hero-kicker">Recruitment demo</span>
+      <h1>Start your Army journey</h1>
+      <p>
+        Discover full-time and part-time routes, explore roles that match your strengths,
+        and learn what happens from your first application to training.
+      </p>
 
-<section class="section">
-  <h2>About Us</h2>
-  <p>At Bluewave, we empower students to innovate and lead in a dynamic global landscape.</p>
-  <img src="https://www.bestchoiceschools.com/wp-content/uploads/2021/12/shutterstock_718598134-980x640.jpg" alt="Campus Image">
-</section>
+      <div class="hero-buttons">
+        <a class="btn btn-yellow" href="#join">How to join</a>
+        <a class="btn btn-light" href="#roles">Find your role</a>
+      </div>
+    </div>
 
-<section class="section" style="background-color: #e6e6e6;">
-  <h2>Programs</h2>
-  <p>Explore our cutting-edge programs in AI, Robotics, Data Science, and more.</p>
-  <img src="https://source.unsplash.com/600x300/?technology,classroom" alt="Programs">
-</section>
+    <aside class="hero-panel">
+      <h2>What are you looking for?</h2>
+      <p>
+        Search by career interest, skill area, lifestyle, or joining path.
+      </p>
 
-<section class="section">
-  <h2>Latest News</h2>
-  <p>Stay up-to-date with events, research breakthroughs, and student achievements.</p>
-  <img src="https://source.unsplash.com/600x300/?news,education" alt="News">
-</section>
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="Search roles, benefits or training" />
+        <button onclick="demoSearch()">Search</button>
+      </div>
 
-<footer>
-  &copy; 2025 Bluewave University. All rights reserved.
-</footer>
+      <div class="suggestions">
+        <span onclick="fillSearch('Combat roles')">Combat roles</span>
+        <span onclick="fillSearch('Apprenticeships')">Apprenticeships</span>
+        <span onclick="fillSearch('Fitness test')">Fitness test</span>
+        <span onclick="fillSearch('Army Reserve')">Army Reserve</span>
+        <span onclick="fillSearch('Application process')">Application process</span>
+      </div>
+    </aside>
+  </header>
 
+  <section class="section" id="regular">
+    <div class="section-title">
+      <h2>Choose your path</h2>
+      <p>
+        Compare Regular Army and Army Reserve routes, then explore the roles,
+        training and benefits available through each route.
+      </p>
+    </div>
+
+    <div class="pathways">
+      <article class="pathway-card">
+        <div class="pathway-image regular-img"></div>
+        <div class="pathway-content">
+          <div>
+            <h3>Regular Army</h3>
+            <p>
+              A full-time career with structured training, progression,
+              qualifications and opportunities to serve in the UK and overseas.
+            </p>
+            <div class="benefits">
+              <div class="benefit">Full-time</div>
+              <div class="benefit">Training</div>
+              <div class="benefit">Career growth</div>
+            </div>
+          </div>
+          <a class="btn btn-yellow" href="#">Explore Regular Army</a>
+        </div>
+      </article>
+
+      <article class="pathway-card" id="reserve">
+        <div class="pathway-image reserve-img"></div>
+        <div class="pathway-content">
+          <div>
+            <h3>Army Reserve</h3>
+            <p>
+              Serve part-time alongside civilian life, gaining new skills,
+              earning extra income and joining a close-knit team.
+            </p>
+            <div class="benefits">
+              <div class="benefit">Part-time</div>
+              <div class="benefit">Flexible</div>
+              <div class="benefit">Extra income</div>
+            </div>
+          </div>
+          <a class="btn btn-yellow" href="#">Explore Reserve</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section roles-section" id="roles">
+    <div class="section-title">
+      <h2>Explore role types</h2>
+      <p>
+        The Army needs people with different strengths — practical thinkers,
+        leaders, engineers, medics, communicators and team players.
+      </p>
+    </div>
+
+    <div class="role-grid">
+      <article class="role-card">
+        <div class="role-number">01</div>
+        <h3>Combat</h3>
+        <p>Take on physically active roles built around teamwork, leadership and resilience.</p>
+      </article>
+
+      <article class="role-card">
+        <div class="role-number">02</div>
+        <h3>Engineering</h3>
+        <p>Work with equipment, vehicles, infrastructure and technical systems.</p>
+      </article>
+
+      <article class="role-card">
+        <div class="role-number">03</div>
+        <h3>Medical</h3>
+        <p>Support soldiers’ health, wellbeing and operational readiness.</p>
+      </article>
+
+      <article class="role-card">
+        <div class="role-number">04</div>
+        <h3>Intelligence & IT</h3>
+        <p>Use data, communications and digital skills to support decisions.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="join">
+    <div class="join-wrapper">
+      <div class="join-callout">
+        <h2>Not sure where to start?</h2>
+        <p>
+          Answer a few simple questions, compare your options and understand the steps
+          before you apply.
+        </p>
+        <a class="btn btn-dark" href="#">Find your fit</a>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <strong>1</strong>
+          <div>
+            <h3>Check eligibility</h3>
+            <p>Review age, nationality, medical, fitness and qualification guidance.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <strong>2</strong>
+          <div>
+            <h3>Submit your application</h3>
+            <p>Create an account, choose your route and start your application online.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <strong>3</strong>
+          <div>
+            <h3>Attend assessment</h3>
+            <p>Complete interviews, fitness checks, medical checks and role discussions.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <strong>4</strong>
+          <div>
+            <h3>Begin training</h3>
+            <p>Start building confidence, discipline, technical skills and Army knowledge.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feature-band">
+    <div class="feature">
+      <h3>Skills for life</h3>
+      <p>Gain practical experience, recognised qualifications and leadership skills.</p>
+    </div>
+
+    <div class="feature">
+      <h3>Teamwork</h3>
+      <p>Work with people from different backgrounds toward a shared mission.</p>
+    </div>
+
+    <div class="feature">
+      <h3>Adventure</h3>
+      <p>Discover sport, travel, outdoor training and personal development opportunities.</p>
+    </div>
+  </section>
+
+  <section class="section" id="events">
+    <div class="section-title">
+      <h2>Upcoming events</h2>
+      <p>
+        Meet serving soldiers, ask questions and learn about roles, training and Army life.
+      </p>
+    </div>
+
+    <div class="events-grid">
+      <article class="event-card">
+        <div class="event-date">
+          <span>Online</span>
+          <strong>18 JUN</strong>
+        </div>
+        <div class="event-body">
+          <h3>Careers Q&A</h3>
+          <p>Join a live session covering roles, eligibility and the application process.</p>
+          <a class="btn btn-yellow" href="#">Register</a>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-date">
+          <span>Manchester</span>
+          <strong>25 JUN</strong>
+        </div>
+        <div class="event-body">
+          <h3>Meet your Army</h3>
+          <p>Speak to recruiters and serving personnel about Army life and training.</p>
+          <a class="btn btn-yellow" href="#">Register</a>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-date">
+          <span>Bristol</span>
+          <strong>03 JUL</strong>
+        </div>
+        <div class="event-body">
+          <h3>Reserve open evening</h3>
+          <p>Learn how part-time service can fit alongside work, study or family life.</p>
+          <a class="btn btn-yellow" href="#">Register</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div>
+      <h2>Ready to start your Army career?</h2>
+      <p>
+        Your skills, determination and perspective could take you further than you think.
+      </p>
+    </div>
+
+    <div>
+      <a class="btn btn-dark" href="#">Apply now</a>
+      <a class="btn btn-light" href="#" style="margin-left: 12px;">Explore roles</a>
+    </div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="logo">
+        <span>ARMY</span>
+        <span>BE THE BEST</span>
+      </div>
+      <p class="demo-note">
+        Demo concept page only. Replace placeholder images, event dates and links
+        before using in production.
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <a href="#">Apply now</a>
+      <a href="#">Find a centre</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy</a>
+    </div>
+  </footer>
+
+  <script>
+    function fillSearch(term) {
+      document.getElementById("searchInput").value = term;
+    }
+
+    function demoSearch() {
+      const value = document.getElementById("searchInput").value.trim();
+
+      if (!value) {
+        alert("Try searching for roles, apprenticeships, fitness or Army Reserve.");
+        return;
+      }
+
+      alert("Demo search for: " + value);
+    }
+  </script>
 <!-- Chat Bot -->
 <!-- Idle Message -->
 
